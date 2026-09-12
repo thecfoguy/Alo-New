@@ -39,6 +39,7 @@
 
     body {
       overscroll-behavior: none;
+      touch-action: pan-y;
     }
 
     button,
@@ -61,6 +62,7 @@
       height: 100%;
       transform: translateX(0);
       transition: transform 280ms ease;
+      will-change: transform;
     }
 
     .track.show-result {
@@ -353,7 +355,7 @@
           </div>
 
           <button class="primary-button" id="translateButton">Translate</button>
-          <p class="hint">Translate, then swipe left.</p>
+          <p class="hint">Swipe left to translate.</p>
         </div>
       </section>
 
@@ -391,10 +393,10 @@
     const resultLanguage = document.getElementById("resultLanguage");
     const status = document.getElementById("status");
 
-    let translationReady = false;
     let startX = 0;
     let startY = 0;
     let touching = false;
+    let translating = false;
 
     const languageNames = {
       es: "Spanish",
@@ -416,11 +418,6 @@
     }
 
     function showResult() {
-      if (!translationReady) {
-        showStatus("Translate first");
-        return;
-      }
-
       input.blur();
       track.classList.add("show-result");
     }
@@ -560,7 +557,9 @@
       }
     }
 
-    async function translate() {
+    async function translateAndShow() {
+      if (translating) return;
+
       const source = input.value.trim();
       const target = language.value;
 
@@ -570,6 +569,7 @@
         return;
       }
 
+      translating = true;
       app.classList.add("loading");
       translateButton.textContent = "Translating...";
 
@@ -601,12 +601,11 @@
         translatedText.textContent = translated;
         phoneticText.textContent = makePhonetic(translated, target);
         resultLanguage.textContent = languageNames[target] || "Translation";
-        translationReady = true;
         showResult();
       } catch (error) {
-        translationReady = false;
         showStatus("Could not translate. Check internet.");
       } finally {
+        translating = false;
         app.classList.remove("loading");
         translateButton.textContent = "Translate";
       }
@@ -614,14 +613,9 @@
 
     input.addEventListener("input", () => {
       count.textContent = input.value.length;
-      translationReady = false;
     });
 
-    language.addEventListener("change", () => {
-      translationReady = false;
-    });
-
-    translateButton.addEventListener("click", translate);
+    translateButton.addEventListener("click", translateAndShow);
     backButton.addEventListener("click", showEntry);
 
     document.addEventListener(
@@ -648,12 +642,16 @@
         const deltaX = endX - startX;
         const deltaY = endY - startY;
 
-        if (Math.abs(deltaX) < 55) return;
+        if (Math.abs(deltaX) < 50) return;
         if (Math.abs(deltaX) <= Math.abs(deltaY)) return;
 
-        if (deltaX < 0) {
-          showResult();
-        } else {
+        const showingResult = track.classList.contains("show-result");
+
+        if (deltaX < 0 && !showingResult) {
+          translateAndShow();
+        }
+
+        if (deltaX > 0 && showingResult) {
           showEntry();
         }
       },
