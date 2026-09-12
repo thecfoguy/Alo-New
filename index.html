@@ -8,7 +8,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Alo">
+
   <title>Alo</title>
+
   <link rel="manifest" href="manifest.json">
 
   <style>
@@ -213,23 +215,11 @@
       font-weight: 700;
     }
 
-    .primary-button {
-      width: 100%;
-      min-height: 56px;
-      margin-top: 18px;
-      border: 0;
-      border-radius: 16px;
-      background: var(--red);
-      color: var(--white);
-      font-size: 17px;
-      font-weight: 800;
-    }
-
     .hint {
-      margin: 16px 0 0;
+      margin: 22px 0 0;
       text-align: center;
       color: #8b8b8b;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 700;
     }
 
@@ -305,41 +295,101 @@
       opacity: 1;
     }
 
-    .loading .primary-button {
-      opacity: 0.65;
+    .loading-message {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 30;
+      transform: translate(-50%, -50%);
+      padding: 14px 18px;
+      border-radius: 14px;
+      background: rgba(0, 0, 0, 0.82);
+      color: var(--white);
+      font-size: 15px;
+      font-weight: 800;
+      opacity: 0;
       pointer-events: none;
+      transition: opacity 150ms ease;
+    }
+
+    .loading-message.show {
+      opacity: 1;
     }
   </style>
 </head>
 
 <body>
   <main class="app" id="app">
+
     <div class="track" id="track">
+
       <section class="screen entry-screen">
+
         <header class="topbar">
+
           <div class="brand">
-            <div class="logo"><span>Alo</span></div>
-            <div class="brand-name">Alo</div>
+            <div class="logo">
+              <span>Alo</span>
+            </div>
+
+            <div class="brand-name">
+              Alo
+            </div>
           </div>
 
           <div class="language-wrap">
-            <label class="language-label" for="language">To</label>
+
+            <label
+              class="language-label"
+              for="language"
+            >
+              To
+            </label>
+
             <select id="language">
-              <option value="es">Spanish</option>
-              <option value="fr">French</option>
-              <option value="it">Italian</option>
-              <option value="pt">Portuguese</option>
-              <option value="de">German</option>
-              <option value="mn">Mongolian</option>
-              <option value="km">Cambodian (Khmer)</option>
+
+              <option value="es">
+                Spanish
+              </option>
+
+              <option value="fr">
+                French
+              </option>
+
+              <option value="it">
+                Italian
+              </option>
+
+              <option value="pt">
+                Portuguese
+              </option>
+
+              <option value="de">
+                German
+              </option>
+
+              <option value="mn">
+                Mongolian
+              </option>
+
+              <option value="km">
+                Cambodian (Khmer)
+              </option>
+
             </select>
+
           </div>
+
         </header>
 
         <div class="content">
-          <p class="prompt">English</p>
+
+          <p class="prompt">
+            English
+          </p>
 
           <div class="input-card">
+
             <textarea
               id="englishInput"
               maxlength="180"
@@ -352,81 +402,188 @@
             <div class="counter">
               <span id="count">0</span>/180
             </div>
+
           </div>
 
-          <button class="primary-button" id="translateButton">Translate</button>
-          <p class="hint">Swipe left to translate.</p>
+          <p class="hint">
+            Swipe left to translate
+          </p>
+
         </div>
+
       </section>
 
       <section class="screen result-screen">
+
         <header class="topbar">
+
           <div class="brand">
-            <div class="logo"><span>Alo</span></div>
-            <div class="brand-name">Alo</div>
+
+            <div class="logo">
+              <span>Alo</span>
+            </div>
+
+            <div class="brand-name">
+              Alo
+            </div>
+
           </div>
+
         </header>
 
         <div class="result-content">
-          <p class="result-label" id="resultLanguage">Spanish</p>
-          <p class="translated" id="translatedText">Your translation appears here.</p>
-          <p class="phonetic" id="phoneticText">Your phonetic spelling appears here.</p>
+
+          <p
+            class="result-label"
+            id="resultLanguage"
+          >
+            Spanish
+          </p>
+
+          <p
+            class="translated"
+            id="translatedText"
+          >
+            Your translation appears here.
+          </p>
+
+          <p
+            class="phonetic"
+            id="phoneticText"
+          >
+            Your phonetic spelling appears here.
+          </p>
+
         </div>
 
-        <button class="back-button" id="backButton">Back</button>
+        <button
+          class="back-button"
+          id="backButton"
+        >
+          Back
+        </button>
+
       </section>
+
     </div>
 
-    <div class="status" id="status"></div>
+    <div
+      class="status"
+      id="status"
+    ></div>
+
+    <div
+      class="loading-message"
+      id="loadingMessage"
+    >
+      Translating...
+    </div>
+
   </main>
 
   <script>
-    const app = document.getElementById("app");
-    const track = document.getElementById("track");
-    const input = document.getElementById("englishInput");
-    const count = document.getElementById("count");
-    const language = document.getElementById("language");
-    const translateButton = document.getElementById("translateButton");
-    const backButton = document.getElementById("backButton");
-    const translatedText = document.getElementById("translatedText");
-    const phoneticText = document.getElementById("phoneticText");
-    const resultLanguage = document.getElementById("resultLanguage");
-    const status = document.getElementById("status");
+
+    const track =
+      document.getElementById("track");
+
+    const input =
+      document.getElementById("englishInput");
+
+    const count =
+      document.getElementById("count");
+
+    const language =
+      document.getElementById("language");
+
+    const backButton =
+      document.getElementById("backButton");
+
+    const translatedText =
+      document.getElementById("translatedText");
+
+    const phoneticText =
+      document.getElementById("phoneticText");
+
+    const resultLanguage =
+      document.getElementById("resultLanguage");
+
+    const status =
+      document.getElementById("status");
+
+    const loadingMessage =
+      document.getElementById("loadingMessage");
 
     let startX = 0;
+
     let startY = 0;
+
     let touching = false;
+
     let translating = false;
 
     const languageNames = {
+
       es: "Spanish",
+
       fr: "French",
+
       it: "Italian",
+
       pt: "Portuguese",
+
       de: "German",
+
       mn: "Mongolian",
+
       km: "Cambodian (Khmer)"
+
     };
 
     function showStatus(message) {
+
       status.textContent = message;
+
       status.classList.add("show");
+
       clearTimeout(showStatus.timer);
-      showStatus.timer = setTimeout(() => {
-        status.classList.remove("show");
-      }, 1800);
+
+      showStatus.timer =
+        setTimeout(() => {
+
+          status.classList.remove("show");
+
+        }, 1800);
+
+    }
+
+    function showLoading() {
+
+      loadingMessage.classList.add("show");
+
+    }
+
+    function hideLoading() {
+
+      loadingMessage.classList.remove("show");
+
     }
 
     function showResult() {
+
       input.blur();
+
       track.classList.add("show-result");
+
     }
 
     function showEntry() {
+
       track.classList.remove("show-result");
+
     }
 
     function phoneticSpanish(text) {
+
       return text
         .toLowerCase()
         .replace(/[¿?¡!.,;:()"']/g, "")
@@ -438,9 +595,11 @@
         .replace(/qui/g, "kee")
         .replace(/ñ/g, "ny")
         .trim();
+
     }
 
     function phoneticFrench(text) {
+
       return text
         .toLowerCase()
         .replace(/[¿?¡!.,;:()"']/g, "")
@@ -451,9 +610,11 @@
         .replace(/j/g, "zh")
         .replace(/gn/g, "ny")
         .trim();
+
     }
 
     function phoneticItalian(text) {
+
       return text
         .toLowerCase()
         .replace(/[¿?¡!.,;:()"']/g, "")
@@ -464,9 +625,11 @@
         .replace(/ci/g, "chee")
         .replace(/ce/g, "cheh")
         .trim();
+
     }
 
     function phoneticPortuguese(text) {
+
       return text
         .toLowerCase()
         .replace(/[¿?¡!.,;:()"']/g, "")
@@ -476,9 +639,11 @@
         .replace(/ch/g, "sh")
         .replace(/j/g, "zh")
         .trim();
+
     }
 
     function phoneticGerman(text) {
+
       return text
         .toLowerCase()
         .replace(/[¿?¡!.,;:()"']/g, "")
@@ -488,181 +653,489 @@
         .replace(/z/g, "ts")
         .replace(/j/g, "y")
         .trim();
+
     }
 
     function phoneticMongolian(text) {
+
       const map = {
-        а: "a", б: "b", в: "v", г: "g", д: "d", е: "ye",
-        ё: "yo", ж: "zh", з: "z", и: "i", й: "y", к: "k",
-        л: "l", м: "m", н: "n", о: "o", ө: "oe", п: "p",
-        р: "r", с: "s", т: "t", у: "u", ү: "ue", ф: "f",
-        х: "kh", ц: "ts", ч: "ch", ш: "sh", щ: "shch",
-        ъ: "", ы: "y", ь: "", э: "e", ю: "yu", я: "ya"
+
+        а: "a",
+
+        б: "b",
+
+        в: "v",
+
+        г: "g",
+
+        д: "d",
+
+        е: "ye",
+
+        ё: "yo",
+
+        ж: "zh",
+
+        з: "z",
+
+        и: "i",
+
+        й: "y",
+
+        к: "k",
+
+        л: "l",
+
+        м: "m",
+
+        н: "n",
+
+        о: "o",
+
+        ө: "oe",
+
+        п: "p",
+
+        р: "r",
+
+        с: "s",
+
+        т: "t",
+
+        у: "u",
+
+        ү: "ue",
+
+        ф: "f",
+
+        х: "kh",
+
+        ц: "ts",
+
+        ч: "ch",
+
+        ш: "sh",
+
+        щ: "shch",
+
+        ъ: "",
+
+        ы: "y",
+
+        ь: "",
+
+        э: "e",
+
+        ю: "yu",
+
+        я: "ya"
+
       };
 
       return text
         .toLowerCase()
         .split("")
-        .map((character) =>
-          Object.prototype.hasOwnProperty.call(map, character)
-            ? map[character]
-            : character
-        )
+        .map((character) => {
+
+          if (
+            Object.prototype.hasOwnProperty.call(
+              map,
+              character
+            )
+          ) {
+
+            return map[character];
+
+          }
+
+          return character;
+
+        })
         .join("")
         .replace(/[¿?¡!.,;:()"']/g, "")
         .trim();
+
     }
 
     function phoneticKhmer(text) {
+
       const map = {
-        ក: "k", ខ: "kh", គ: "k", ឃ: "kh", ង: "ng",
-        ច: "ch", ឆ: "chh", ជ: "ch", ឈ: "chh", ញ: "nh",
-        ដ: "d", ឋ: "th", ឌ: "d", ឍ: "th", ណ: "n",
-        ត: "t", ថ: "th", ទ: "t", ធ: "th", ន: "n",
-        ប: "b", ផ: "ph", ព: "p", ភ: "ph", ម: "m",
-        យ: "y", រ: "r", ល: "l", វ: "v", ស: "s",
-        ហ: "h", ឡ: "l", អ: "a"
+
+        ក: "k",
+
+        ខ: "kh",
+
+        គ: "k",
+
+        ឃ: "kh",
+
+        ង: "ng",
+
+        ច: "ch",
+
+        ឆ: "chh",
+
+        ជ: "ch",
+
+        ឈ: "chh",
+
+        ញ: "nh",
+
+        ដ: "d",
+
+        ឋ: "th",
+
+        ឌ: "d",
+
+        ឍ: "th",
+
+        ណ: "n",
+
+        ត: "t",
+
+        ថ: "th",
+
+        ទ: "t",
+
+        ធ: "th",
+
+        ន: "n",
+
+        ប: "b",
+
+        ផ: "ph",
+
+        ព: "p",
+
+        ភ: "ph",
+
+        ម: "m",
+
+        យ: "y",
+
+        រ: "r",
+
+        ល: "l",
+
+        វ: "v",
+
+        ស: "s",
+
+        ហ: "h",
+
+        ឡ: "l",
+
+        អ: "a"
+
       };
 
       return text
         .split("")
-        .map((character) =>
-          Object.prototype.hasOwnProperty.call(map, character)
-            ? map[character]
-            : character
-        )
+        .map((character) => {
+
+          if (
+            Object.prototype.hasOwnProperty.call(
+              map,
+              character
+            )
+          ) {
+
+            return map[character];
+
+          }
+
+          return character;
+
+        })
         .join("")
         .replace(/[¿?¡!.,;:()"']/g, "")
         .trim();
+
     }
 
-    function makePhonetic(text, lang) {
+    function makePhonetic(
+      text,
+      lang
+    ) {
+
       switch (lang) {
+
         case "es":
+
           return phoneticSpanish(text);
+
         case "fr":
+
           return phoneticFrench(text);
+
         case "it":
+
           return phoneticItalian(text);
+
         case "pt":
+
           return phoneticPortuguese(text);
+
         case "de":
+
           return phoneticGerman(text);
+
         case "mn":
+
           return phoneticMongolian(text);
+
         case "km":
+
           return phoneticKhmer(text);
+
         default:
+
           return text;
+
       }
+
     }
 
     async function translateAndShow() {
-      if (translating) return;
 
-      const source = input.value.trim();
-      const target = language.value;
+      if (translating) {
+
+        return;
+
+      }
+
+      const source =
+        input.value.trim();
+
+      const target =
+        language.value;
 
       if (!source) {
-        showStatus("Enter English first");
+
+        showStatus(
+          "Enter English first"
+        );
+
         input.focus();
+
         return;
+
       }
 
       translating = true;
-      app.classList.add("loading");
-      translateButton.textContent = "Translating...";
+
+      input.blur();
+
+      showLoading();
 
       try {
+
         const url =
           "https://api.mymemory.translated.net/get?q=" +
           encodeURIComponent(source) +
           "&langpair=en|" +
           encodeURIComponent(target);
 
-        const response = await fetch(url);
+        const response =
+          await fetch(url);
 
         if (!response.ok) {
-          throw new Error("Translation request failed");
+
+          throw new Error(
+            "Translation request failed"
+          );
+
         }
 
-        const data = await response.json();
+        const data =
+          await response.json();
+
         const translated =
           data &&
           data.responseData &&
-          typeof data.responseData.translatedText === "string"
+          typeof data.responseData.translatedText ===
+            "string"
             ? data.responseData.translatedText
             : "";
 
         if (!translated) {
-          throw new Error("No translation returned");
+
+          throw new Error(
+            "No translation returned"
+          );
+
         }
 
-        translatedText.textContent = translated;
-        phoneticText.textContent = makePhonetic(translated, target);
-        resultLanguage.textContent = languageNames[target] || "Translation";
+        translatedText.textContent =
+          translated;
+
+        phoneticText.textContent =
+          makePhonetic(
+            translated,
+            target
+          );
+
+        resultLanguage.textContent =
+          languageNames[target] ||
+          "Translation";
+
         showResult();
+
       } catch (error) {
-        showStatus("Could not translate. Check internet.");
+
+        showStatus(
+          "Could not translate. Check internet."
+        );
+
       } finally {
+
         translating = false;
-        app.classList.remove("loading");
-        translateButton.textContent = "Translate";
+
+        hideLoading();
+
       }
+
     }
 
-    input.addEventListener("input", () => {
-      count.textContent = input.value.length;
-    });
+    input.addEventListener(
+      "input",
+      () => {
 
-    translateButton.addEventListener("click", translateAndShow);
-    backButton.addEventListener("click", showEntry);
+        count.textContent =
+          input.value.length;
+
+      }
+    );
+
+    backButton.addEventListener(
+      "click",
+      () => {
+
+        showEntry();
+
+      }
+    );
 
     document.addEventListener(
       "touchstart",
       (event) => {
-        if (event.touches.length !== 1) return;
 
-        startX = event.touches[0].clientX;
-        startY = event.touches[0].clientY;
+        if (
+          event.touches.length !== 1
+        ) {
+
+          return;
+
+        }
+
+        startX =
+          event.touches[0].clientX;
+
+        startY =
+          event.touches[0].clientY;
+
         touching = true;
+
       },
-      { passive: true }
+      {
+        passive: true
+      }
     );
 
     document.addEventListener(
       "touchend",
       (event) => {
-        if (!touching || event.changedTouches.length !== 1) return;
+
+        if (
+          !touching ||
+          event.changedTouches.length !== 1
+        ) {
+
+          return;
+
+        }
 
         touching = false;
 
-        const endX = event.changedTouches[0].clientX;
-        const endY = event.changedTouches[0].clientY;
-        const deltaX = endX - startX;
-        const deltaY = endY - startY;
+        const endX =
+          event.changedTouches[0].clientX;
 
-        if (Math.abs(deltaX) < 50) return;
-        if (Math.abs(deltaX) <= Math.abs(deltaY)) return;
+        const endY =
+          event.changedTouches[0].clientY;
 
-        const showingResult = track.classList.contains("show-result");
+        const deltaX =
+          endX - startX;
 
-        if (deltaX < 0 && !showingResult) {
+        const deltaY =
+          endY - startY;
+
+        if (
+          Math.abs(deltaX) < 50
+        ) {
+
+          return;
+
+        }
+
+        if (
+          Math.abs(deltaX) <=
+          Math.abs(deltaY)
+        ) {
+
+          return;
+
+        }
+
+        const showingResult =
+          track.classList.contains(
+            "show-result"
+          );
+
+        if (
+          deltaX < 0 &&
+          !showingResult
+        ) {
+
           translateAndShow();
+
+          return;
+
         }
 
-        if (deltaX > 0 && showingResult) {
+        if (
+          deltaX > 0 &&
+          showingResult
+        ) {
+
           showEntry();
+
         }
+
       },
-      { passive: true }
+      {
+        passive: true
+      }
     );
 
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("sw.js").catch(() => {});
-      });
+    if (
+      "serviceWorker" in navigator
+    ) {
+
+      window.addEventListener(
+        "load",
+        () => {
+
+          navigator
+            .serviceWorker
+            .register("sw.js")
+            .catch(() => {});
+
+        }
+      );
+
     }
+
   </script>
+
 </body>
 </html>
