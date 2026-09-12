@@ -7,13 +7,20 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Alo">
   <title>Alo</title>
-
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="icon-192.png">
-  <link rel="apple-touch-icon" href="icon-192.png">
 
   <style>
+    :root {
+      --red: #e53935;
+      --green: #35b56a;
+      --black: #111111;
+      --gray: #777777;
+      --line: #e7e7e7;
+      --white: #ffffff;
+    }
+
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
@@ -21,12 +28,13 @@
 
     html,
     body {
-      margin: 0;
       width: 100%;
       height: 100%;
+      margin: 0;
       overflow: hidden;
+      background: var(--white);
       font-family: Arial, Helvetica, sans-serif;
-      background: #ffffff;
+      color: var(--black);
     }
 
     body {
@@ -34,301 +42,477 @@
     }
 
     button,
-    textarea {
+    textarea,
+    select {
       font: inherit;
     }
 
     .app {
-      width: 200vw;
+      width: 100%;
       height: 100dvh;
-      display: flex;
-      transition: transform 0.35s ease;
-      will-change: transform;
+      overflow: hidden;
+      position: relative;
+      background: var(--white);
     }
 
-    .app.show-result {
-      transform: translateX(-100vw);
+    .track {
+      display: flex;
+      width: 200%;
+      height: 100%;
+      transform: translateX(0);
+      transition: transform 280ms ease;
+    }
+
+    .track.show-result {
+      transform: translateX(-50%);
     }
 
     .screen {
-      width: 100vw;
-      height: 100dvh;
-      flex: 0 0 100vw;
-      padding:
-        calc(24px + env(safe-area-inset-top))
-        22px
-        calc(24px + env(safe-area-inset-bottom));
+      width: 50%;
+      height: 100%;
+      flex: 0 0 50%;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      padding:
+        max(22px, env(safe-area-inset-top))
+        22px
+        max(24px, env(safe-area-inset-bottom));
     }
 
     .entry-screen {
-      background: #ffffff;
-      color: #111111;
+      background: var(--white);
     }
 
     .result-screen {
-      position: relative;
-      justify-content: center;
-      background: #22a447;
-      color: #ffffff;
-      text-align: center;
+      background: var(--green);
+      color: var(--white);
+    }
+
+    .topbar {
+      min-height: 66px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .logo {
-      margin-top: 7vh;
-      margin-bottom: 34px;
-      font-size: 58px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--white);
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .logo span {
+      color: var(--red);
+      font-size: 19px;
       font-weight: 800;
-      letter-spacing: -3px;
+      letter-spacing: -0.5px;
     }
 
-    .language-title {
-      margin-bottom: 12px;
-      font-size: 15px;
-      font-weight: 700;
+    .brand-name {
+      color: var(--red);
+      font-size: 25px;
+      font-weight: 800;
+      letter-spacing: -0.8px;
     }
 
-    .language-row {
-      width: 100%;
-      max-width: 440px;
+    .result-screen .brand-name {
+      color: var(--white);
+    }
+
+    .language-wrap {
       display: flex;
+      align-items: center;
       gap: 8px;
-      margin-bottom: 26px;
     }
 
-    .language-button {
-      flex: 1;
-      min-height: 48px;
-      padding: 0 8px;
-      border: 1px solid #d4d4d4;
-      border-radius: 14px;
-      background: #ffffff;
-      color: #111111;
+    .language-label {
+      color: var(--gray);
       font-size: 13px;
       font-weight: 700;
     }
 
-    .language-button.selected {
-      border-color: #111111;
-      background: #111111;
-      color: #ffffff;
+    select {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--white);
+      color: var(--black);
+      padding: 9px 10px;
+      outline: none;
+      font-size: 14px;
+      font-weight: 700;
     }
 
-    .input-wrap {
-      width: 100%;
-      max-width: 440px;
+    .content {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .prompt {
+      margin: 0 0 14px;
+      color: var(--gray);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    .input-card {
+      padding: 18px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     }
 
     textarea {
       width: 100%;
-      min-height: 170px;
-      padding: 18px;
-      border: 1px solid #dedede;
-      border-radius: 18px;
-      outline: none;
+      min-height: 180px;
+      max-height: 34vh;
       resize: none;
-      background: #fafafa;
-      color: #111111;
-      font-size: 22px;
-      line-height: 1.4;
-    }
-
-    textarea:focus {
-      border-color: #999999;
-      background: #ffffff;
-    }
-
-    .swipe-hint {
-      margin-top: 22px;
-      color: #777777;
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .result-language {
-      margin-bottom: 18px;
-      font-size: 15px;
-      font-weight: 800;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      opacity: 0.82;
-    }
-
-    .translation {
-      width: 100%;
-      max-width: 540px;
-      margin-bottom: 22px;
-      font-size: clamp(30px, 8vw, 50px);
-      font-weight: 800;
+      border: 0;
+      outline: 0;
+      padding: 0;
+      background: transparent;
+      color: var(--black);
+      font-size: clamp(28px, 7vw, 44px);
       line-height: 1.15;
-      overflow-wrap: anywhere;
+      font-weight: 700;
     }
 
-    .phonetic-label {
-      margin-bottom: 8px;
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 1.4px;
-      text-transform: uppercase;
-      opacity: 0.76;
+    textarea::placeholder {
+      color: #b6b6b6;
     }
 
-    .phonetic {
+    .counter {
+      margin-top: 10px;
+      text-align: right;
+      color: #999999;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .primary-button {
       width: 100%;
-      max-width: 540px;
-      font-size: clamp(23px, 6vw, 34px);
-      font-weight: 600;
-      line-height: 1.35;
-      overflow-wrap: anywhere;
+      min-height: 56px;
+      margin-top: 18px;
+      border: 0;
+      border-radius: 16px;
+      background: var(--red);
+      color: var(--white);
+      font-size: 17px;
+      font-weight: 800;
     }
 
-    .back-hint {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: calc(30px + env(safe-area-inset-bottom));
+    .primary-button:active {
+      transform: scale(0.99);
+    }
+
+    .hint {
+      margin: 16px 0 0;
+      text-align: center;
+      color: #8b8b8b;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .result-content {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .result-label {
+      margin: 0 0 18px;
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
       opacity: 0.8;
     }
 
-    @media (max-width: 360px) {
-      .screen {
-        padding-left: 16px;
-        padding-right: 16px;
-      }
+    .translated {
+      max-width: 92%;
+      margin: 0 auto 18px;
+      font-size: clamp(22px, 5.6vw, 34px);
+      line-height: 1.2;
+      font-weight: 700;
+      word-break: break-word;
+      opacity: 0.92;
+    }
 
-      .language-button {
-        font-size: 12px;
-      }
+    .phonetic {
+      max-width: 94%;
+      margin: 0 auto;
+      font-size: clamp(34px, 9vw, 56px);
+      line-height: 1.08;
+      font-weight: 900;
+      letter-spacing: -1px;
+      word-break: break-word;
+    }
+
+    .back-button {
+      align-self: center;
+      min-width: 150px;
+      min-height: 50px;
+      border: 2px solid rgba(255, 255, 255, 0.9);
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--white);
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .status {
+      position: absolute;
+      left: 50%;
+      bottom: calc(20px + env(safe-area-inset-bottom));
+      z-index: 20;
+      transform: translateX(-50%);
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.82);
+      color: var(--white);
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+    }
+
+    .status.show {
+      opacity: 1;
+    }
+
+    .loading .primary-button {
+      opacity: 0.65;
+      pointer-events: none;
     }
   </style>
 </head>
 
 <body>
-  <main id="app" class="app">
-    <section class="screen entry-screen">
-      <div class="logo">Alo</div>
+  <main class="app" id="app">
+    <div class="track" id="track">
 
-      <div class="language-title">Choose a language</div>
+      <section class="screen entry-screen">
+        <header class="topbar">
+          <div class="brand">
+            <div class="logo"><span>Alo</span></div>
+            <div class="brand-name">Alo</div>
+          </div>
 
-      <div class="language-row">
-        <button class="language-button selected" type="button" data-code="fr" data-name="French">
-          French
+          <div class="language-wrap">
+            <label class="language-label" for="language">To</label>
+            <select id="language">
+              <option value="es">Spanish</option>
+              <option value="fr">French</option>
+              <option value="it">Italian</option>
+              <option value="pt">Portuguese</option>
+              <option value="de">German</option>
+            </select>
+          </div>
+        </header>
+
+        <div class="content">
+          <p class="prompt">English</p>
+
+          <div class="input-card">
+            <textarea
+              id="englishInput"
+              maxlength="180"
+              autocomplete="off"
+              autocapitalize="sentences"
+              spellcheck="true"
+              placeholder="Type what you want to say..."
+            ></textarea>
+
+            <div class="counter">
+              <span id="count">0</span>/180
+            </div>
+          </div>
+
+          <button class="primary-button" id="translateButton">
+            Translate
+          </button>
+
+          <p class="hint">Translate, then swipe left.</p>
+        </div>
+      </section>
+
+      <section class="screen result-screen">
+        <header class="topbar">
+          <div class="brand">
+            <div class="logo"><span>Alo</span></div>
+            <div class="brand-name">Alo</div>
+          </div>
+        </header>
+
+        <div class="result-content">
+          <p class="result-label" id="resultLanguage">Spanish</p>
+          <p class="translated" id="translatedText">
+            Your translation appears here.
+          </p>
+          <p class="phonetic" id="phoneticText">
+            Your phonetic spelling appears here.
+          </p>
+        </div>
+
+        <button class="back-button" id="backButton">
+          Back
         </button>
+      </section>
 
-        <button class="language-button" type="button" data-code="km" data-name="Cambodian">
-          Cambodian
-        </button>
+    </div>
 
-        <button class="language-button" type="button" data-code="mn" data-name="Mongolian">
-          Mongolian
-        </button>
-      </div>
-
-      <div class="input-wrap">
-        <textarea
-          id="englishInput"
-          placeholder="Type something in English..."
-          autocomplete="off"
-          autocapitalize="sentences"
-          spellcheck="true"
-        ></textarea>
-      </div>
-
-      <div class="swipe-hint">Swipe left to translate ←</div>
-    </section>
-
-    <section class="screen result-screen">
-      <div id="resultLanguage" class="result-language">French</div>
-      <div id="translation" class="translation">Your translation</div>
-      <div class="phonetic-label">Say it like this</div>
-      <div id="phonetic" class="phonetic">Your pronunciation</div>
-      <div class="back-hint">Swipe right to go back →</div>
-    </section>
+    <div class="status" id="status"></div>
   </main>
 
   <script>
     const app = document.getElementById("app");
+    const track = document.getElementById("track");
     const input = document.getElementById("englishInput");
-    const translationBox = document.getElementById("translation");
-    const phoneticBox = document.getElementById("phonetic");
+    const count = document.getElementById("count");
+    const language = document.getElementById("language");
+    const translateButton = document.getElementById("translateButton");
+    const backButton = document.getElementById("backButton");
+    const translatedText = document.getElementById("translatedText");
+    const phoneticText = document.getElementById("phoneticText");
     const resultLanguage = document.getElementById("resultLanguage");
-    const languageButtons = document.querySelectorAll(".language-button");
+    const status = document.getElementById("status");
 
-    let selectedCode = "fr";
-    let selectedName = "French";
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let translating = false;
+    let translationReady = false;
+    let startX = 0;
+    let startY = 0;
+    let touching = false;
 
-    languageButtons.forEach((button) => {
-      button.addEventListener("click", () => {
-        languageButtons.forEach((item) => item.classList.remove("selected"));
-        button.classList.add("selected");
-        selectedCode = button.dataset.code;
-        selectedName = button.dataset.name;
-      });
-    });
+    const languageNames = {
+      es: "Spanish",
+      fr: "French",
+      it: "Italian",
+      pt: "Portuguese",
+      de: "German"
+    };
 
-    function extractTranslation(data) {
-      if (!Array.isArray(data?.[0])) {
-        return "";
-      }
+    function showStatus(message) {
+      status.textContent = message;
+      status.classList.add("show");
+      clearTimeout(showStatus.timer);
 
-      return data[0]
-        .map((part) => Array.isArray(part) && typeof part[0] === "string" ? part[0] : "")
-        .join("")
-        .trim();
+      showStatus.timer = setTimeout(() => {
+        status.classList.remove("show");
+      }, 1800);
     }
 
-    function extractPhonetic(data) {
-      const parts = [];
-
-      if (Array.isArray(data?.[0])) {
-        data[0].forEach((part) => {
-          if (!Array.isArray(part)) {
-            return;
-          }
-
-          if (typeof part[2] === "string" && part[2].trim()) {
-            parts.push(part[2].trim());
-          }
-
-          if (typeof part[3] === "string" && part[3].trim()) {
-            parts.push(part[3].trim());
-          }
-        });
-      }
-
-      return [...new Set(parts)].join(" ").trim();
-    }
-
-    async function translateText() {
-      const text = input.value.trim();
-
-      if (!text || translating) {
+    function showResult() {
+      if (!translationReady) {
+        showStatus("Translate first");
         return;
       }
 
-      translating = true;
-      resultLanguage.textContent = selectedName;
-      translationBox.textContent = "Translating...";
-      phoneticBox.textContent = "Please wait";
-      app.classList.add("show-result");
       input.blur();
+      track.classList.add("show-result");
+    }
+
+    function showEntry() {
+      track.classList.remove("show-result");
+    }
+
+    function simplePhonetic(text, lang) {
+      let value = text
+        .toLowerCase()
+        .replace(/[¿?¡!.,;:()"']/g, "")
+        .trim();
+
+      const rules = {
+        es: [
+          [/ll/g, "y"],
+          [/j/g, "h"],
+          [/gue/g, "geh"],
+          [/gui/g, "gee"],
+          [/que/g, "keh"],
+          [/qui/g, "kee"],
+          [/ñ/g, "ny"]
+        ],
+
+        fr: [
+          [/eau/g, "oh"],
+          [/oi/g, "wah"],
+          [/ou/g, "oo"],
+          [/ch/g, "sh"],
+          [/j/g, "zh"],
+          [/gn/g, "ny"]
+        ],
+
+        it: [
+          [/gli/g, "lyee"],
+          [/gn/g, "ny"],
+          [/chi/g, "kee"],
+          [/che/g, "keh"],
+          [/ci/g, "chee"],
+          [/ce/g, "cheh"]
+        ],
+
+        pt: [
+          [/nh/g, "ny"],
+          [/lh/g, "ly"],
+          [/ão/g, "owng"],
+          [/ch/g, "sh"],
+          [/j/g, "zh"]
+        ],
+
+        de: [
+          [/sch/g, "sh"],
+          [/ch/g, "kh"],
+          [/w/g, "v"],
+          [/z/g, "ts"],
+          [/j/g, "y"]
+        ]
+      };
+
+      for (const [pattern, replacement] of rules[lang] || []) {
+        value = value.replace(pattern, replacement);
+      }
+
+      return value;
+    }
+
+    async function translate() {
+      const source = input.value.trim();
+      const target = language.value;
+
+      if (!source) {
+        showStatus("Enter English first");
+        input.focus();
+        return;
+      }
+
+      app.classList.add("loading");
+      translateButton.textContent = "Translating...";
 
       try {
         const url =
-          "https://translate.googleapis.com/translate_a/single" +
-          "?client=gtx" +
-          "&sl=en" +
-          "&tl=" + encodeURIComponent(selectedCode) +
-          "&dt=t" +
-          "&dt=rm" +
-          "&q=" + encodeURIComponent(text);
+          "https://api.mymemory.translated.net/get?q=" +
+          encodeURIComponent(source) +
+          "&langpair=en|" +
+          encodeURIComponent(target);
 
         const response = await fetch(url);
 
@@ -337,33 +521,51 @@
         }
 
         const data = await response.json();
-        const translated = extractTranslation(data);
-        const phonetic = extractPhonetic(data);
+        const translated =
+          data?.responseData?.translatedText || "";
 
-        translationBox.textContent =
-          translated || "Translation unavailable";
+        if (!translated) {
+          throw new Error("No translation returned");
+        }
 
-        phoneticBox.textContent =
-          phonetic || "Phonetic spelling unavailable for this phrase.";
+        translatedText.textContent = translated;
+        phoneticText.textContent =
+          simplePhonetic(translated, target);
+        resultLanguage.textContent =
+          languageNames[target] || "Translation";
+
+        translationReady = true;
+        showResult();
       } catch (error) {
-        translationBox.textContent = "Couldn't translate";
-        phoneticBox.textContent =
-          "Check your internet connection and swipe right to try again.";
+        translationReady = false;
+        showStatus("Could not translate. Check internet.");
       } finally {
-        translating = false;
+        app.classList.remove("loading");
+        translateButton.textContent = "Translate";
       }
     }
 
-    function goBack() {
-      app.classList.remove("show-result");
-    }
+    input.addEventListener("input", () => {
+      count.textContent = input.value.length;
+      translationReady = false;
+    });
+
+    language.addEventListener("change", () => {
+      translationReady = false;
+    });
+
+    translateButton.addEventListener("click", translate);
+
+    backButton.addEventListener("click", showEntry);
 
     document.addEventListener(
       "touchstart",
       (event) => {
-        const touch = event.changedTouches[0];
-        touchStartX = touch.screenX;
-        touchStartY = touch.screenY;
+        if (event.touches.length !== 1) return;
+
+        startX = event.touches[0].clientX;
+        startY = event.touches[0].clientY;
+        touching = true;
       },
       { passive: true }
     );
@@ -371,25 +573,24 @@
     document.addEventListener(
       "touchend",
       (event) => {
-        const touch = event.changedTouches[0];
-        const deltaX = touch.screenX - touchStartX;
-        const deltaY = touch.screenY - touchStartY;
-
-        if (Math.abs(deltaX) < 60) {
+        if (!touching || event.changedTouches.length !== 1) {
           return;
         }
 
-        if (Math.abs(deltaX) <= Math.abs(deltaY)) {
-          return;
-        }
+        touching = false;
 
-        if (deltaX < 0 && !app.classList.contains("show-result")) {
-          translateText();
-          return;
-        }
+        const endX = event.changedTouches[0].clientX;
+        const endY = event.changedTouches[0].clientY;
+        const deltaX = endX - startX;
+        const deltaY = endY - startY;
 
-        if (deltaX > 0 && app.classList.contains("show-result")) {
-          goBack();
+        if (Math.abs(deltaX) < 55) return;
+        if (Math.abs(deltaX) <= Math.abs(deltaY)) return;
+
+        if (deltaX < 0) {
+          showResult();
+        } else {
+          showEntry();
         }
       },
       { passive: true }
@@ -397,7 +598,9 @@
 
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("sw.js").catch(() => {});
+        navigator.serviceWorker
+          .register("sw.js")
+          .catch(() => {});
       });
     }
   </script>
