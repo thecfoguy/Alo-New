@@ -1,4 +1,4 @@
-const CACHE_NAME = "alo-v1";
+const CACHE_NAME = "alo-v2";
 
 const APP_FILES = [
   "./",
