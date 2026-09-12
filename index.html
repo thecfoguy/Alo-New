@@ -311,7 +311,6 @@
 <body>
   <main class="app" id="app">
     <div class="track" id="track">
-
       <section class="screen entry-screen">
         <header class="topbar">
           <div class="brand">
@@ -367,19 +366,12 @@
 
         <div class="result-content">
           <p class="result-label" id="resultLanguage">Spanish</p>
-          <p class="translated" id="translatedText">
-            Your translation appears here.
-          </p>
-          <p class="phonetic" id="phoneticText">
-            Your phonetic spelling appears here.
-          </p>
+          <p class="translated" id="translatedText">Your translation appears here.</p>
+          <p class="phonetic" id="phoneticText">Your phonetic spelling appears here.</p>
         </div>
 
-        <button class="back-button" id="backButton">
-          Back
-        </button>
+        <button class="back-button" id="backButton">Back</button>
       </section>
-
     </div>
 
     <div class="status" id="status"></div>
@@ -415,7 +407,6 @@
       status.textContent = message;
       status.classList.add("show");
       clearTimeout(showStatus.timer);
-
       showStatus.timer = setTimeout(() => {
         status.classList.remove("show");
       }, 1800);
@@ -426,7 +417,6 @@
         showStatus("Translate first");
         return;
       }
-
       input.blur();
       track.classList.add("show-result");
     }
@@ -451,7 +441,6 @@
           [/qui/g, "kee"],
           [/ñ/g, "ny"]
         ],
-
         fr: [
           [/eau/g, "oh"],
           [/oi/g, "wah"],
@@ -460,7 +449,6 @@
           [/j/g, "zh"],
           [/gn/g, "ny"]
         ],
-
         it: [
           [/gli/g, "lyee"],
           [/gn/g, "ny"],
@@ -469,7 +457,6 @@
           [/ci/g, "chee"],
           [/ce/g, "cheh"]
         ],
-
         pt: [
           [/nh/g, "ny"],
           [/lh/g, "ly"],
@@ -477,7 +464,6 @@
           [/ch/g, "sh"],
           [/j/g, "zh"]
         ],
-
         de: [
           [/sch/g, "sh"],
           [/ch/g, "kh"],
@@ -490,7 +476,6 @@
       for (const [pattern, replacement] of rules[lang] || []) {
         value = value.replace(pattern, replacement);
       }
-
       return value;
     }
 
@@ -515,25 +500,19 @@
           encodeURIComponent(target);
 
         const response = await fetch(url);
-
         if (!response.ok) {
           throw new Error("Translation request failed");
         }
 
         const data = await response.json();
-        const translated =
-          data?.responseData?.translatedText || "";
-
+        const translated = data?.responseData?.translatedText || "";
         if (!translated) {
           throw new Error("No translation returned");
         }
 
         translatedText.textContent = translated;
-        phoneticText.textContent =
-          simplePhonetic(translated, target);
-        resultLanguage.textContent =
-          languageNames[target] || "Translation";
-
+        phoneticText.textContent = simplePhonetic(translated, target);
+        resultLanguage.textContent = languageNames[target] || "Translation";
         translationReady = true;
         showResult();
       } catch (error) {
@@ -555,14 +534,12 @@
     });
 
     translateButton.addEventListener("click", translate);
-
     backButton.addEventListener("click", showEntry);
 
     document.addEventListener(
       "touchstart",
       (event) => {
         if (event.touches.length !== 1) return;
-
         startX = event.touches[0].clientX;
         startY = event.touches[0].clientY;
         touching = true;
@@ -573,10 +550,7 @@
     document.addEventListener(
       "touchend",
       (event) => {
-        if (!touching || event.changedTouches.length !== 1) {
-          return;
-        }
-
+        if (!touching || event.changedTouches.length !== 1) return;
         touching = false;
 
         const endX = event.changedTouches[0].clientX;
@@ -598,9 +572,7 @@
 
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker
-          .register("sw.js")
-          .catch(() => {});
+        navigator.serviceWorker.register("sw.js").catch(() => {});
       });
     }
   </script>
