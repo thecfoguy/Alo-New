@@ -151,6 +151,7 @@
       outline: none;
       font-size: 14px;
       font-weight: 700;
+      max-width: 150px;
     }
 
     .content {
@@ -326,6 +327,8 @@
               <option value="it">Italian</option>
               <option value="pt">Portuguese</option>
               <option value="de">German</option>
+              <option value="mn">Mongolian</option>
+              <option value="km">Cambodian (Khmer)</option>
             </select>
           </div>
         </header>
@@ -400,13 +403,16 @@
       fr: "French",
       it: "Italian",
       pt: "Portuguese",
-      de: "German"
+      de: "German",
+      mn: "Mongolian",
+      km: "Cambodian (Khmer)"
     };
 
     function showStatus(message) {
       status.textContent = message;
       status.classList.add("show");
       clearTimeout(showStatus.timer);
+
       showStatus.timer = setTimeout(() => {
         status.classList.remove("show");
       }, 1800);
@@ -417,6 +423,7 @@
         showStatus("Translate first");
         return;
       }
+
       input.blur();
       track.classList.add("show-result");
     }
@@ -470,12 +477,77 @@
           [/w/g, "v"],
           [/z/g, "ts"],
           [/j/g, "y"]
+        ],
+        mn: [
+          [/а/g, "a"],
+          [/б/g, "b"],
+          [/в/g, "v"],
+          [/г/g, "g"],
+          [/д/g, "d"],
+          [/е/g, "ye"],
+          [/ё/g, "yo"],
+          [/ж/g, "zh"],
+          [/з/g, "z"],
+          [/и/g, "i"],
+          [/й/g, "y"],
+          [/к/g, "k"],
+          [/л/g, "l"],
+          [/м/g, "m"],
+          [/н/g, "n"],
+          [/о/g, "o"],
+          [/ө/g, "ö"],
+          [/п/g, "p"],
+          [/р/g, "r"],
+          [/с/g, "s"],
+          [/т/g, "t"],
+          [/у/g, "u"],
+          [/ү/g, "ü"],
+          [/ф/g, "f"],
+          [/х/g, "kh"],
+          [/ц/g, "ts"],
+          [/ч/g, "ch"],
+          [/ш/g, "sh"],
+          [/щ/g, "shch"],
+          [/ъ/g, ""],
+          [/ы/g, "y"],
+          [/ь/g, ""],
+          [/э/g, "e"],
+          [/ю/g, "yu"],
+          [/я/g, "ya"]
+        ],
+        km: [
+          [/ខ/g, "kh"],
+          [/ឃ/g, "kh"],
+          [/គ/g, "k"],
+          [/ក/g, "k"],
+          [/ង/g, "ng"],
+          [/ច/g, "ch"],
+          [/ឆ/g, "chh"],
+          [/ជ/g, "ch"],
+          [/ញ/g, "nh"],
+          [/ដ/g, "d"],
+          [/ត/g, "t"],
+          [/ថ/g, "th"],
+          [/ទ/g, "t"],
+          [/ន/g, "n"],
+          [/ប/g, "b"],
+          [/ផ/g, "ph"],
+          [/ព/g, "p"],
+          [/ម/g, "m"],
+          [/យ/g, "y"],
+          [/រ/g, "r"],
+          [/ល/g, "l"],
+          [/វ/g, "v"],
+          [/ស/g, "s"],
+          [/ហ/g, "h"],
+          [/អ/g, "a"]
         ]
       };
 
       for (const [pattern, replacement] of rules[lang] || []) {
         value = value.replace(pattern, replacement);
       }
+
       return value;
     }
 
@@ -500,12 +572,14 @@
           encodeURIComponent(target);
 
         const response = await fetch(url);
+
         if (!response.ok) {
           throw new Error("Translation request failed");
         }
 
         const data = await response.json();
         const translated = data?.responseData?.translatedText || "";
+
         if (!translated) {
           throw new Error("No translation returned");
         }
@@ -540,6 +614,7 @@
       "touchstart",
       (event) => {
         if (event.touches.length !== 1) return;
+
         startX = event.touches[0].clientX;
         startY = event.touches[0].clientY;
         touching = true;
@@ -551,6 +626,7 @@
       "touchend",
       (event) => {
         if (!touching || event.changedTouches.length !== 1) return;
+
         touching = false;
 
         const endX = event.changedTouches[0].clientX;
