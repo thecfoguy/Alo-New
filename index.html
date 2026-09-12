@@ -93,12 +93,14 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
     }
 
     .brand {
       display: flex;
       align-items: center;
       gap: 10px;
+      flex-shrink: 0;
     }
 
     .logo {
@@ -134,15 +136,19 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      min-width: 0;
     }
 
     .language-label {
       color: var(--gray);
       font-size: 13px;
       font-weight: 700;
+      flex-shrink: 0;
     }
 
     select {
+      min-width: 0;
+      max-width: 175px;
       border: 1px solid var(--line);
       border-radius: 12px;
       background: var(--white);
@@ -151,7 +157,6 @@
       outline: none;
       font-size: 14px;
       font-weight: 700;
-      max-width: 150px;
     }
 
     .content {
@@ -216,10 +221,6 @@
       color: var(--white);
       font-size: 17px;
       font-weight: 800;
-    }
-
-    .primary-button:active {
-      transform: scale(0.99);
     }
 
     .hint {
@@ -351,10 +352,7 @@
             </div>
           </div>
 
-          <button class="primary-button" id="translateButton">
-            Translate
-          </button>
-
+          <button class="primary-button" id="translateButton">Translate</button>
           <p class="hint">Translate, then swipe left.</p>
         </div>
       </section>
@@ -412,7 +410,6 @@
       status.textContent = message;
       status.classList.add("show");
       clearTimeout(showStatus.timer);
-
       showStatus.timer = setTimeout(() => {
         status.classList.remove("show");
       }, 1800);
@@ -432,123 +429,135 @@
       track.classList.remove("show-result");
     }
 
-    function simplePhonetic(text, lang) {
-      let value = text
+    function phoneticSpanish(text) {
+      return text
         .toLowerCase()
         .replace(/[¿?¡!.,;:()"']/g, "")
+        .replace(/ll/g, "y")
+        .replace(/j/g, "h")
+        .replace(/gue/g, "geh")
+        .replace(/gui/g, "gee")
+        .replace(/que/g, "keh")
+        .replace(/qui/g, "kee")
+        .replace(/ñ/g, "ny")
         .trim();
+    }
 
-      const rules = {
-        es: [
-          [/ll/g, "y"],
-          [/j/g, "h"],
-          [/gue/g, "geh"],
-          [/gui/g, "gee"],
-          [/que/g, "keh"],
-          [/qui/g, "kee"],
-          [/ñ/g, "ny"]
-        ],
-        fr: [
-          [/eau/g, "oh"],
-          [/oi/g, "wah"],
-          [/ou/g, "oo"],
-          [/ch/g, "sh"],
-          [/j/g, "zh"],
-          [/gn/g, "ny"]
-        ],
-        it: [
-          [/gli/g, "lyee"],
-          [/gn/g, "ny"],
-          [/chi/g, "kee"],
-          [/che/g, "keh"],
-          [/ci/g, "chee"],
-          [/ce/g, "cheh"]
-        ],
-        pt: [
-          [/nh/g, "ny"],
-          [/lh/g, "ly"],
-          [/ão/g, "owng"],
-          [/ch/g, "sh"],
-          [/j/g, "zh"]
-        ],
-        de: [
-          [/sch/g, "sh"],
-          [/ch/g, "kh"],
-          [/w/g, "v"],
-          [/z/g, "ts"],
-          [/j/g, "y"]
-        ],
-        mn: [
-          [/а/g, "a"],
-          [/б/g, "b"],
-          [/в/g, "v"],
-          [/г/g, "g"],
-          [/д/g, "d"],
-          [/е/g, "ye"],
-          [/ё/g, "yo"],
-          [/ж/g, "zh"],
-          [/з/g, "z"],
-          [/и/g, "i"],
-          [/й/g, "y"],
-          [/к/g, "k"],
-          [/л/g, "l"],
-          [/м/g, "m"],
-          [/н/g, "n"],
-          [/о/g, "o"],
-          [/ө/g, "ö"],
-          [/п/g, "p"],
-          [/р/g, "r"],
-          [/с/g, "s"],
-          [/т/g, "t"],
-          [/у/g, "u"],
-          [/ү/g, "ü"],
-          [/ф/g, "f"],
-          [/х/g, "kh"],
-          [/ц/g, "ts"],
-          [/ч/g, "ch"],
-          [/ш/g, "sh"],
-          [/щ/g, "shch"],
-          [/ъ/g, ""],
-          [/ы/g, "y"],
-          [/ь/g, ""],
-          [/э/g, "e"],
-          [/ю/g, "yu"],
-          [/я/g, "ya"]
-        ],
-        km: [
-          [/ខ/g, "kh"],
-          [/ឃ/g, "kh"],
-          [/គ/g, "k"],
-          [/ក/g, "k"],
-          [/ង/g, "ng"],
-          [/ច/g, "ch"],
-          [/ឆ/g, "chh"],
-          [/ជ/g, "ch"],
-          [/ញ/g, "nh"],
-          [/ដ/g, "d"],
-          [/ត/g, "t"],
-          [/ថ/g, "th"],
-          [/ទ/g, "t"],
-          [/ន/g, "n"],
-          [/ប/g, "b"],
-          [/ផ/g, "ph"],
-          [/ព/g, "p"],
-          [/ម/g, "m"],
-          [/យ/g, "y"],
-          [/រ/g, "r"],
-          [/ល/g, "l"],
-          [/វ/g, "v"],
-          [/ស/g, "s"],
-          [/ហ/g, "h"],
-          [/អ/g, "a"]
-        ]
+    function phoneticFrench(text) {
+      return text
+        .toLowerCase()
+        .replace(/[¿?¡!.,;:()"']/g, "")
+        .replace(/eau/g, "oh")
+        .replace(/oi/g, "wah")
+        .replace(/ou/g, "oo")
+        .replace(/ch/g, "sh")
+        .replace(/j/g, "zh")
+        .replace(/gn/g, "ny")
+        .trim();
+    }
+
+    function phoneticItalian(text) {
+      return text
+        .toLowerCase()
+        .replace(/[¿?¡!.,;:()"']/g, "")
+        .replace(/gli/g, "lyee")
+        .replace(/gn/g, "ny")
+        .replace(/chi/g, "kee")
+        .replace(/che/g, "keh")
+        .replace(/ci/g, "chee")
+        .replace(/ce/g, "cheh")
+        .trim();
+    }
+
+    function phoneticPortuguese(text) {
+      return text
+        .toLowerCase()
+        .replace(/[¿?¡!.,;:()"']/g, "")
+        .replace(/nh/g, "ny")
+        .replace(/lh/g, "ly")
+        .replace(/ão/g, "owng")
+        .replace(/ch/g, "sh")
+        .replace(/j/g, "zh")
+        .trim();
+    }
+
+    function phoneticGerman(text) {
+      return text
+        .toLowerCase()
+        .replace(/[¿?¡!.,;:()"']/g, "")
+        .replace(/sch/g, "sh")
+        .replace(/ch/g, "kh")
+        .replace(/w/g, "v")
+        .replace(/z/g, "ts")
+        .replace(/j/g, "y")
+        .trim();
+    }
+
+    function phoneticMongolian(text) {
+      const map = {
+        а: "a", б: "b", в: "v", г: "g", д: "d", е: "ye",
+        ё: "yo", ж: "zh", з: "z", и: "i", й: "y", к: "k",
+        л: "l", м: "m", н: "n", о: "o", ө: "oe", п: "p",
+        р: "r", с: "s", т: "t", у: "u", ү: "ue", ф: "f",
+        х: "kh", ц: "ts", ч: "ch", ш: "sh", щ: "shch",
+        ъ: "", ы: "y", ь: "", э: "e", ю: "yu", я: "ya"
       };
 
-      for (const [pattern, replacement] of rules[lang] || []) {
-        value = value.replace(pattern, replacement);
-      }
+      return text
+        .toLowerCase()
+        .split("")
+        .map((character) =>
+          Object.prototype.hasOwnProperty.call(map, character)
+            ? map[character]
+            : character
+        )
+        .join("")
+        .replace(/[¿?¡!.,;:()"']/g, "")
+        .trim();
+    }
 
-      return value;
+    function phoneticKhmer(text) {
+      const map = {
+        ក: "k", ខ: "kh", គ: "k", ឃ: "kh", ង: "ng",
+        ច: "ch", ឆ: "chh", ជ: "ch", ឈ: "chh", ញ: "nh",
+        ដ: "d", ឋ: "th", ឌ: "d", ឍ: "th", ណ: "n",
+        ត: "t", ថ: "th", ទ: "t", ធ: "th", ន: "n",
+        ប: "b", ផ: "ph", ព: "p", ភ: "ph", ម: "m",
+        យ: "y", រ: "r", ល: "l", វ: "v", ស: "s",
+        ហ: "h", ឡ: "l", អ: "a"
+      };
+
+      return text
+        .split("")
+        .map((character) =>
+          Object.prototype.hasOwnProperty.call(map, character)
+            ? map[character]
+            : character
+        )
+        .join("")
+        .replace(/[¿?¡!.,;:()"']/g, "")
+        .trim();
+    }
+
+    function makePhonetic(text, lang) {
+      switch (lang) {
+        case "es":
+          return phoneticSpanish(text);
+        case "fr":
+          return phoneticFrench(text);
+        case "it":
+          return phoneticItalian(text);
+        case "pt":
+          return phoneticPortuguese(text);
+        case "de":
+          return phoneticGerman(text);
+        case "mn":
+          return phoneticMongolian(text);
+        case "km":
+          return phoneticKhmer(text);
+        default:
+          return text;
+      }
     }
 
     async function translate() {
@@ -578,14 +587,19 @@
         }
 
         const data = await response.json();
-        const translated = data?.responseData?.translatedText || "";
+        const translated =
+          data &&
+          data.responseData &&
+          typeof data.responseData.translatedText === "string"
+            ? data.responseData.translatedText
+            : "";
 
         if (!translated) {
           throw new Error("No translation returned");
         }
 
         translatedText.textContent = translated;
-        phoneticText.textContent = simplePhonetic(translated, target);
+        phoneticText.textContent = makePhonetic(translated, target);
         resultLanguage.textContent = languageNames[target] || "Translation";
         translationReady = true;
         showResult();
