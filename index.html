@@ -265,7 +265,6 @@
       text-align: center;
       color: #8b8b8b;
       font-size: 14px;
-      line-height: 1.45;
       font-weight: 700;
     }
 
@@ -381,7 +380,7 @@
               autocomplete="off"
               autocapitalize="sentences"
               spellcheck="true"
-              placeholder="Type what you want to say..."
+              placeholder="Type what you want to say or..."
             ></textarea>
 
             <div class="input-bottom">
@@ -398,17 +397,14 @@
               </button>
 
               <div class="voice-copy" id="voiceCopy">
-                Tap the mic to hear the selected language and translate it into English.
+                Tap the mic to hear what they're saying and to translate it into English.
               </div>
 
               <div class="counter"><span id="count">0</span>/180</div>
             </div>
           </div>
 
-          <p class="hint">
-            Type what you want to say, then swipe left.<br><br>
-            Or tap the red microphone to understand what they’re saying, then swipe left.
-          </p>
+          <p class="hint">Swipe left to translate typed English</p>
         </div>
       </section>
 
@@ -490,7 +486,7 @@
         voiceCopy.textContent = "Listening... speak now.";
       } else {
         voiceCopy.textContent =
-          "Tap the mic to hear the selected language and translate it into English.";
+          "Tap the mic to hear what they're saying and to translate it into English.";
       }
     }
 
