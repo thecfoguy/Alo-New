@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Alo">
+  <title>Alo</title>
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    :root {
+      --red: #e53935;
+      --green: #35b56a;
+      --black: #111111;
+      --gray: #777777;
+      --line: #e7e7e7;
+      --white: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--white);
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--black);
+    }
+
+    body {
+      overscroll-behavior: none;
+      touch-action: pan-y;
+    }
+
+    textarea,
+    select,
+    button {
+      font: inherit;
+    }
+
+    .app {
+      width: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      position: relative;
+      background: var(--white);
+    }
+
+    .track {
+      display: flex;
+      width: 200%;
+      height: 100%;
+      transform: translateX(0);
+      transition: transform 280ms ease;
+    }
+
+    .track.show-result {
+      transform: translateX(-50%);
+    }
+
+    .screen {
+      width: 50%;
+      flex: 0 0 50%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding:
+        max(22px, env(safe-area-inset-top))
+        22px
+        max(24px, env(safe-area-inset-bottom));
+    }
+
+    .entry-screen {
+      background: var(--white);
+    }
+
+    .result-screen {
+      background: var(--green);
+      color: var(--white);
+    }
+
+    .topbar {
+      min-height: 66px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--white);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .logo span {
+      color: var(--red);
+      font-size: 19px;
+      font-weight: 800;
+    }
+
+    .brand-name {
+      color: var(--red);
+      font-size: 25px;
+      font-weight: 800;
+    }
+
+    .result-screen .brand-name {
+      color: var(--white);
+    }
+
+    .language-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .language-label {
+      color: var(--gray);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    select {
+      max-width: 175px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--white);
+      color: var(--black);
+      padding: 9px 10px;
+      outline: none;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .prompt {
+      margin: 0 0 14px;
+      color: var(--gray);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+    }
+
+    .input-card {
+      padding: 18px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      max-height: 30vh;
+      resize: none;
+      border: 0;
+      outline: 0;
+      padding: 0;
+      background: transparent;
+      color: var(--black);
+      font-size: clamp(28px, 7vw, 44px);
+      line-height: 1.15;
+      font-weight: 700;
+    }
+
+    textarea::placeholder {
+      color: #b6b6b6;
+    }
+
+    .input-bottom {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .mic-button {
+      width: 58px;
+      height: 58px;
+      flex: 0 0 58px;
+      border: 0;
+      border-radius: 50%;
+      background: var(--red);
+      color: var(--white);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 6px 18px rgba(229,57,53,.28);
+      cursor: pointer;
+    }
+
+    .mic-button.listening {
+      animation: pulse 1s infinite;
+    }
+
+    .mic-button svg {
+      width: 27px;
+      height: 27px;
+      fill: currentColor;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(229,57,53,.42);
+      }
+
+      70% {
+        transform: scale(1.06);
+        box-shadow: 0 0 0 14px rgba(229,57,53,0);
+      }
+
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(229,57,53,0);
+      }
+    }
+
+    .voice-copy {
+      flex: 1;
+      color: #8a8a8a;
+      font-size: 13px;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .counter {
+      margin-left: auto;
+      color: #999;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .hint {
+      margin: 22px 0 0;
+      text-align: center;
+      color: #8b8b8b;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .result-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .result-label {
+      margin: 0 0 18px;
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      opacity: .8;
+    }
+
+    .translated {
+      max-width: 92%;
+      margin: 0 auto 18px;
+      font-size: clamp(22px, 5.6vw, 34px);
+      line-height: 1.2;
+      font-weight: 700;
+      word-break: break-word;
+      opacity: .92;
+    }
+
+    .phonetic {
+      max-width: 94%;
+      margin: 0 auto;
+      font-size: clamp(34px, 9vw, 56px);
+      line-height: 1.08;
+      font-weight: 900;
+      word-break: break-word;
+    }
+
+    .status,
+    .loading {
+      position: absolute;
+      left: 50%;
+      z-index: 20;
+      transform: translateX(-50%);
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.82);
+      color: var(--white);
+      font-size: 13px;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+    }
+
+    .status {
+      bottom: calc(20px + env(safe-area-inset-bottom));
+    }
+
+    .loading {
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .status.show,
+    .loading.show {
+      opacity: 1;
+    }
+
+    @media (max-height: 650px) {
+      textarea {
+        min-height: 110px;
+      }
+
+      .hint {
+        margin-top: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <div class="track" id="track">
+      <section class="screen entry-screen">
+        <header class="topbar">
+          <div class="brand">
+            <div class="logo"><span>Alo</span></div>
+            <div class="brand-name">Alo</div>
+          </div>
+
+          <div class="language-wrap">
+            <label class="language-label" for="language">To</label>
+            <select id="language">
+              <option value="es">Spanish</option>
+              <option value="fr">French</option>
+              <option value="it">Italian</option>
+              <option value="pt">Portuguese</option>
+              <option value="de">German</option>
+              <option value="mn">Mongolian</option>
+              <option value="km">Cambodian (Khmer)</option>
+            </select>
+          </div>
+        </header>
+
+        <div class="content">
+          <p class="prompt">English</p>
+
+          <div class="input-card">
+            <textarea
+              id="englishInput"
+              maxlength="180"
+              autocomplete="off"
+              autocapitalize="sentences"
+              spellcheck="true"
+              placeholder="Type what you want to say..."
+            ></textarea>
+
+            <div class="input-bottom">
+              <button
+                class="mic-button"
+                id="micButton"
+                type="button"
+                aria-label="Listen and translate"
+                title="Listen and translate"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21H8v2h8v-2h-3v-3.08A7 7 0 0 0 19 11h-2Z"/>
+                </svg>
+              </button>
+
+              <div class="voice-copy" id="voiceCopy">
+                Tap the mic to hear the selected language and translate it into English.
+              </div>
+
+              <div class="counter"><span id="count">0</span>/180</div>
+            </div>
+          </div>
+
+          <p class="hint">Swipe left to translate typed English</p>
+        </div>
+      </section>
+
+      <section class="screen result-screen">
+        <header class="topbar">
+          <div class="brand">
+            <div class="logo"><span>Alo</span></div>
+            <div class="brand-name">Alo</div>
+          </div>
+        </header>
+
+        <div class="result-content">
+          <p class="result-label" id="resultLanguage">Spanish</p>
+          <p class="translated" id="translatedText"></p>
+          <p class="phonetic" id="phoneticText"></p>
+        </div>
+      </section>
+    </div>
+
+    <div class="status" id="status"></div>
+    <div class="loading" id="loading">Translating...</div>
+  </main>
+
+  <script>
+    const track = document.getElementById("track");
+    const input = document.getElementById("englishInput");
+    const count = document.getElementById("count");
+    const language = document.getElementById("language");
+    const translatedText = document.getElementById("translatedText");
+    const phoneticText = document.getElementById("phoneticText");
+    const resultLanguage = document.getElementById("resultLanguage");
+    const status = document.getElementById("status");
+    const loading = document.getElementById("loading");
+    const micButton = document.getElementById("micButton");
+    const voiceCopy = document.getElementById("voiceCopy");
+
+    const languageNames = {
+      es: "Spanish",
+      fr: "French",
+      it: "Italian",
+      pt: "Portuguese",
+      de: "German",
+      mn: "Mongolian",
+      km: "Cambodian (Khmer)"
+    };
+
+    const speechLocales = {
+      es: "es-ES",
+      fr: "fr-FR",
+      it: "it-IT",
+      pt: "pt-PT",
+      de: "de-DE",
+      mn: "mn-MN",
+      km: "km-KH"
+    };
+
+    let startX = 0;
+    let startY = 0;
+    let touching = false;
+    let busy = false;
+    let listening = false;
+    let recognition = null;
+
+    function showStatus(message) {
+      status.textContent = message;
+      status.classList.add("show");
+      clearTimeout(showStatus.timer);
+
+      showStatus.timer = setTimeout(() => {
+        status.classList.remove("show");
+      }, 2000);
+    }
+
+    function setListeningState(isListening) {
+      listening = isListening;
+      micButton.classList.toggle("listening", isListening);
+
+      if (isListening) {
+        voiceCopy.textContent = "Listening... speak now.";
+      } else {
+        voiceCopy.textContent =
+          "Tap the mic to hear the selected language and translate it into English.";
+      }
+    }
+
+    function showFreshEntry() {
+      input.value = "";
+      count.textContent = "0";
+      translatedText.textContent = "";
+      phoneticText.textContent = "";
+      resultLanguage.textContent =
+        languageNames[language.value] || "Translation";
+
+      track.classList.remove("show-result");
+
+      if (recognition && listening) {
+        recognition.stop();
+      }
+
+      setListeningState(false);
+
+      setTimeout(() => {
+        input.focus();
+      }, 300);
+    }
+
+    function showResult() {
+      input.blur();
+      track.classList.add("show-result");
+    }
+
+    function phoneticSpanish(text) {
+      return text
+        .toLowerCase()
+        .replace(/[¿?¡!.,;:()"']/g, "")
+        .replace(/ll/g, "y")
+        .replace(/j/g, "h")
+        .replace(/gue/g, "geh")
+        .replace(/gui/g, "gee")
+        .replace(/que/g, "keh")
+        .replace(/qui/g, "kee")
+        .replace(/ñ/g, "ny")
+        .trim();
+    }
+
+    function phoneticFrench(text) {
+      return text
+        .toLowerCase()
+        .replace(/[¿?¡!.,;:()"']/g, "")
+        .replace(/eau/g, "oh")
+        .replace(/oi/g, "wah")
+        .replace(/ou/g, "oo")
+        .replace(/ch/g, "sh")
+        .replace(/j/g, "zh")
+        .replace(/gn/g, "ny")
+        .trim();
+    }
+
+    function phoneticItalian(text) {
+      return text
+        .toLowerCase()
+        .replace(/[¿?¡!.,;:()"']/g, "")
+        .replace(/gli/g, "lyee")
+        .replace(/gn/g, "ny")
+        .replace(/chi/g, "kee")
+        .replace(/che/g, "keh")
+        .replace(/ci/g, "chee")
+        .replace(/ce/g, "cheh")
+        .trim();
+    }
+
+    function phoneticPortuguese(text) {
+      return text
+        .toLowerCase()
+        .replace(/[¿?¡!.,;:()"']/g, "")
+        .replace(/nh/g, "ny")
+        .replace(/lh/g, "ly")
+        .replace(/ão/g, "owng")
+        .replace(/ch/g, "sh")
+        .replace(/j/g, "zh")
+        .trim();
+    }
+
+    function phoneticGerman(text) {
+      return text
+        .toLowerCase()
+        .replace(/[¿?¡!.,;:()"']/g, "")
+        .replace(/sch/g, "sh")
+        .replace(/ch/g, "kh")
+        .replace(/w/g, "v")
+        .replace(/z/g, "ts")
+        .replace(/j/g, "y")
+        .trim();
+    }
+
+    function phoneticMongolian(text) {
+      const map = {
+        а: "a", б: "b", в: "v", г: "g", д: "d", е: "ye", ё: "yo",
+        ж: "zh", з: "z", и: "i", й: "y", к: "k", л: "l", м: "m",
+        н: "n", о: "o", ө: "oe", п: "p", р: "r", с: "s", т: "t",
+        у: "u", ү: "ue", ф: "f", х: "kh", ц: "ts", ч: "ch",
+        ш: "sh", щ: "shch", ъ: "", ы: "y", ь: "", э: "e",
+        ю: "yu", я: "ya"
+      };
+
+      return text
+        .toLowerCase()
+        .split("")
+        .map(ch =>
+          Object.prototype.hasOwnProperty.call(map, ch) ? map[ch] : ch
+        )
+        .join("")
+        .replace(/[¿?¡!.,;:()"']/g, "")
+        .trim();
+    }
+
+    function phoneticKhmer(text) {
+      const map = {
+        ក: "k", ខ: "kh", គ: "k", ឃ: "kh", ង: "ng", ច: "ch",
+        ឆ: "chh", ជ: "ch", ឈ: "chh", ញ: "nh", ដ: "d", ឋ: "th",
+        ឌ: "d", ឍ: "th", ណ: "n", ត: "t", ថ: "th", ទ: "t",
+        ធ: "th", ន: "n", ប: "b", ផ: "ph", ព: "p", ភ: "ph",
+        ម: "m", យ: "y", រ: "r", ល: "l", វ: "v", ស: "s",
+        ហ: "h", ឡ: "l", អ: "a"
+      };
+
+      return text
+        .split("")
+        .map(ch =>
+          Object.prototype.hasOwnProperty.call(map, ch) ? map[ch] : ch
+        )
+        .join("")
+        .replace(/[¿?¡!.,;:()"']/g, "")
+        .trim();
+    }
+
+    function makePhonetic(text, lang) {
+      if (lang === "es") return phoneticSpanish(text);
+      if (lang === "fr") return phoneticFrench(text);
+      if (lang === "it") return phoneticItalian(text);
+      if (lang === "pt") return phoneticPortuguese(text);
+      if (lang === "de") return phoneticGerman(text);
+      if (lang === "mn") return phoneticMongolian(text);
+      if (lang === "km") return phoneticKhmer(text);
+      return text;
+    }
+
+    async function requestTranslation(source, fromLanguage, toLanguage) {
+      const url =
+        "https://api.mymemory.translated.net/get?q=" +
+        encodeURIComponent(source) +
+        "&langpair=" +
+        encodeURIComponent(fromLanguage) +
+        "|" +
+        encodeURIComponent(toLanguage);
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error("request failed");
+      }
+
+      const data = await response.json();
+      const translated = data?.responseData?.translatedText || "";
+
+      if (!translated) {
+        throw new Error("empty result");
+      }
+
+      return translated;
+    }
+
+    async function swipeTranslate() {
+      if (busy || listening) return;
+
+      const source = input.value.trim();
+      const target = language.value;
+
+      if (!source) {
+        showStatus("Enter English first");
+        input.focus();
+        return;
+      }
+
+      busy = true;
+      input.blur();
+      loading.textContent = "Translating...";
+      loading.classList.add("show");
+
+      try {
+        const translated = await requestTranslation(source, "en", target);
+
+        translatedText.textContent = translated;
+        phoneticText.textContent = makePhonetic(translated, target);
+        resultLanguage.textContent =
+          languageNames[target] || "Translation";
+
+        showResult();
+      } catch (error) {
+        showStatus("Could not translate. Check internet.");
+      } finally {
+        busy = false;
+        loading.classList.remove("show");
+      }
+    }
+
+    async function translateSpeechToEnglish(spokenText, sourceLanguage) {
+      if (!spokenText || busy) return;
+
+      busy = true;
+      loading.textContent = "Translating speech...";
+      loading.classList.add("show");
+
+      try {
+        const english = await requestTranslation(
+          spokenText,
+          sourceLanguage,
+          "en"
+        );
+
+        translatedText.textContent = spokenText;
+        phoneticText.textContent = english;
+        resultLanguage.textContent = "English";
+
+        showResult();
+      } catch (error) {
+        showStatus("Could not translate speech.");
+      } finally {
+        busy = false;
+        loading.classList.remove("show");
+      }
+    }
+
+    function startSpeechRecognition() {
+      if (busy) return;
+
+      const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+      if (!SpeechRecognition) {
+        showStatus("Speech recognition is not available in this browser.");
+        return;
+      }
+
+      if (listening && recognition) {
+        recognition.stop();
+        return;
+      }
+
+      recognition = new SpeechRecognition();
+      recognition.lang = speechLocales[language.value] || language.value;
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onstart = () => {
+        setListeningState(true);
+      };
+
+      recognition.onresult = event => {
+        const spokenText =
+          event.results?.[0]?.[0]?.transcript?.trim() || "";
+
+        if (!spokenText) {
+          showStatus("I did not catch that.");
+          return;
+        }
+
+        input.value = spokenText.slice(0, 180);
+        count.textContent = input.value.length;
+
+        translateSpeechToEnglish(
+          spokenText,
+          language.value
+        );
+      };
+
+      recognition.onerror = event => {
+        if (
+          event.error === "not-allowed" ||
+          event.error === "service-not-allowed"
+        ) {
+          showStatus("Microphone permission is needed.");
+          return;
+        }
+
+        if (event.error === "no-speech") {
+          showStatus("No speech heard. Try again.");
+          return;
+        }
+
+        if (event.error === "language-not-supported") {
+          showStatus("Speech recognition does not support this language here.");
+          return;
+        }
+
+        showStatus("Could not hear that. Try again.");
+      };
+
+      recognition.onend = () => {
+        setListeningState(false);
+      };
+
+      try {
+        recognition.start();
+      } catch (error) {
+        setListeningState(false);
+        showStatus("Could not start the microphone.");
+      }
+    }
+
+    input.addEventListener("input", () => {
+      count.textContent = input.value.length;
+    });
+
+    micButton.addEventListener("click", event => {
+      event.preventDefault();
+      event.stopPropagation();
+      input.blur();
+      startSpeechRecognition();
+    });
+
+    language.addEventListener("change", () => {
+      if (listening && recognition) {
+        recognition.stop();
+      }
+    });
+
+    document.addEventListener(
+      "touchstart",
+      event => {
+        if (event.touches.length !== 1) return;
+
+        startX = event.touches[0].clientX;
+        startY = event.touches[0].clientY;
+        touching = true;
+      },
+      { passive: true }
+    );
+
+    document.addEventListener(
+      "touchend",
+      event => {
+        if (!touching || event.changedTouches.length !== 1) return;
+
+        touching = false;
+
+        const dx = event.changedTouches[0].clientX - startX;
+        const dy = event.changedTouches[0].clientY - startY;
+
+        if (Math.abs(dx) < 45) return;
+        if (Math.abs(dx) <= Math.abs(dy)) return;
+
+        const onResult = track.classList.contains("show-result");
+
+        if (dx < 0 && !onResult) {
+          swipeTranslate();
+          return;
+        }
+
+        if (dx < 0 && onResult) {
+          showFreshEntry();
+        }
+      },
+      { passive: true }
+    );
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("sw.js")
+          .catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
