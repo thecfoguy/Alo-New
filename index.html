@@ -9,7 +9,6 @@
   <meta name="apple-mobile-web-app-title" content="Alo">
   <title>Alo</title>
   <link rel="manifest" href="manifest.json">
-
   <style>
     :root {
       --red: #e53935;
@@ -35,7 +34,6 @@
       font-family: Arial, Helvetica, sans-serif;
       color: var(--black);
     }
-
     body {
       overscroll-behavior: none;
       touch-action: pan-y;
@@ -66,7 +64,6 @@
     .track.show-result {
       transform: translateX(-50%);
     }
-
     .screen {
       width: 50%;
       flex: 0 0 50%;
@@ -87,7 +84,6 @@
       background: var(--green);
       color: var(--white);
     }
-
     .topbar {
       min-height: 66px;
       display: flex;
@@ -111,7 +107,6 @@
       place-items: center;
       box-shadow: 0 2px 10px rgba(0,0,0,.08);
     }
-
     .logo span {
       color: var(--red);
       font-size: 19px;
@@ -139,7 +134,6 @@
       font-size: 13px;
       font-weight: 700;
     }
-
     select {
       max-width: 175px;
       border: 1px solid var(--line);
@@ -158,7 +152,6 @@
       flex-direction: column;
       justify-content: center;
     }
-
     .prompt {
       margin: 0 0 14px;
       color: var(--gray);
@@ -175,7 +168,6 @@
       border-radius: 22px;
       box-shadow: 0 10px 30px rgba(0,0,0,.08);
     }
-
     textarea {
       width: 100%;
       min-height: 150px;
@@ -194,7 +186,6 @@
     textarea::placeholder {
       color: #b6b6b6;
     }
-
     .input-bottom {
       margin-top: 12px;
       display: flex;
@@ -216,7 +207,6 @@
       box-shadow: 0 6px 18px rgba(229,57,53,.28);
       cursor: pointer;
     }
-
     .mic-button.listening {
       animation: pulse 1s infinite;
     }
@@ -243,7 +233,6 @@
         box-shadow: 0 0 0 0 rgba(229,57,53,0);
       }
     }
-
     .voice-copy {
       flex: 1;
       color: #8a8a8a;
@@ -267,7 +256,6 @@
       font-size: 14px;
       font-weight: 700;
     }
-
     .result-content {
       flex: 1;
       display: flex;
@@ -283,7 +271,6 @@
       text-transform: uppercase;
       opacity: .8;
     }
-
     .translated {
       max-width: 92%;
       margin: 0 auto 18px;
@@ -302,7 +289,6 @@
       font-weight: 900;
       word-break: break-word;
     }
-
     .status,
     .loading {
       position: absolute;
@@ -323,7 +309,6 @@
     .status {
       bottom: calc(20px + env(safe-area-inset-bottom));
     }
-
     .loading {
       top: 50%;
       transform: translate(-50%, -50%);
@@ -345,7 +330,6 @@
     }
   </style>
 </head>
-
 <body>
   <main class="app">
     <div class="track" id="track">
@@ -355,7 +339,6 @@
             <div class="logo"><span>Alo</span></div>
             <div class="brand-name">Alo</div>
           </div>
-
           <div class="language-wrap">
             <label class="language-label" for="language">To</label>
             <select id="language">
@@ -369,7 +352,6 @@
             </select>
           </div>
         </header>
-
         <div class="content">
           <p class="prompt">English</p>
 
@@ -382,7 +364,6 @@
               spellcheck="true"
               placeholder="Type what you want to say or..."
             ></textarea>
-
             <div class="input-bottom">
               <button
                 class="mic-button"
@@ -395,7 +376,6 @@
                   <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21H8v2h8v-2h-3v-3.08A7 7 0 0 0 19 11h-2Z"/>
                 </svg>
               </button>
-
               <div class="voice-copy" id="voiceCopy">
                 Tap the mic to hear what they're saying and to translate it into English.
               </div>
@@ -404,10 +384,9 @@
             </div>
           </div>
 
-          <p class="hint">Swipe left to translate typed English</p>
+          <p class="hint">Swipe left to translate</p>
         </div>
       </section>
-
       <section class="screen result-screen">
         <header class="topbar">
           <div class="brand">
@@ -423,11 +402,9 @@
         </div>
       </section>
     </div>
-
     <div class="status" id="status"></div>
     <div class="loading" id="loading">Translating...</div>
   </main>
-
   <script>
     const track = document.getElementById("track");
     const input = document.getElementById("englishInput");
@@ -440,7 +417,6 @@
     const loading = document.getElementById("loading");
     const micButton = document.getElementById("micButton");
     const voiceCopy = document.getElementById("voiceCopy");
-
     const languageNames = {
       es: "Spanish",
       fr: "French",
@@ -467,7 +443,6 @@
     let busy = false;
     let listening = false;
     let recognition = null;
-
     function showStatus(message) {
       status.textContent = message;
       status.classList.add("show");
@@ -481,7 +456,6 @@
     function setListeningState(isListening) {
       listening = isListening;
       micButton.classList.toggle("listening", isListening);
-
       if (isListening) {
         voiceCopy.textContent = "Listening... speak now.";
       } else {
@@ -497,7 +471,6 @@
       phoneticText.textContent = "";
       resultLanguage.textContent =
         languageNames[language.value] || "Translation";
-
       track.classList.remove("show-result");
 
       if (recognition && listening) {
@@ -515,7 +488,6 @@
       input.blur();
       track.classList.add("show-result");
     }
-
     function phoneticSpanish(text) {
       return text
         .toLowerCase()
@@ -529,7 +501,6 @@
         .replace(/ñ/g, "ny")
         .trim();
     }
-
     function phoneticFrench(text) {
       return text
         .toLowerCase()
@@ -542,7 +513,6 @@
         .replace(/gn/g, "ny")
         .trim();
     }
-
     function phoneticItalian(text) {
       return text
         .toLowerCase()
@@ -555,7 +525,6 @@
         .replace(/ce/g, "cheh")
         .trim();
     }
-
     function phoneticPortuguese(text) {
       return text
         .toLowerCase()
@@ -567,7 +536,6 @@
         .replace(/j/g, "zh")
         .trim();
     }
-
     function phoneticGerman(text) {
       return text
         .toLowerCase()
@@ -579,7 +547,6 @@
         .replace(/j/g, "y")
         .trim();
     }
-
     function phoneticMongolian(text) {
       const map = {
         а: "a", б: "b", в: "v", г: "g", д: "d", е: "ye", ё: "yo",
@@ -589,7 +556,6 @@
         ш: "sh", щ: "shch", ъ: "", ы: "y", ь: "", э: "e",
         ю: "yu", я: "ya"
       };
-
       return text
         .toLowerCase()
         .split("")
@@ -600,7 +566,6 @@
         .replace(/[¿?¡!.,;:()"']/g, "")
         .trim();
     }
-
     function phoneticKhmer(text) {
       const map = {
         ក: "k", ខ: "kh", គ: "k", ឃ: "kh", ង: "ng", ច: "ch",
@@ -610,7 +575,6 @@
         ម: "m", យ: "y", រ: "r", ល: "l", វ: "v", ស: "s",
         ហ: "h", ឡ: "l", អ: "a"
       };
-
       return text
         .split("")
         .map(ch =>
@@ -620,7 +584,6 @@
         .replace(/[¿?¡!.,;:()"']/g, "")
         .trim();
     }
-
     function makePhonetic(text, lang) {
       if (lang === "es") return phoneticSpanish(text);
       if (lang === "fr") return phoneticFrench(text);
@@ -631,7 +594,6 @@
       if (lang === "km") return phoneticKhmer(text);
       return text;
     }
-
     async function requestTranslation(source, fromLanguage, toLanguage) {
       const url =
         "https://api.mymemory.translated.net/get?q=" +
@@ -646,7 +608,6 @@
       if (!response.ok) {
         throw new Error("request failed");
       }
-
       const data = await response.json();
       const translated = data?.responseData?.translatedText || "";
 
@@ -668,7 +629,6 @@
         input.focus();
         return;
       }
-
       busy = true;
       input.blur();
       loading.textContent = "Translating...";
@@ -681,7 +641,6 @@
         phoneticText.textContent = makePhonetic(translated, target);
         resultLanguage.textContent =
           languageNames[target] || "Translation";
-
         showResult();
       } catch (error) {
         showStatus("Could not translate. Check internet.");
@@ -697,7 +656,6 @@
       busy = true;
       loading.textContent = "Translating speech...";
       loading.classList.add("show");
-
       try {
         const english = await requestTranslation(
           spokenText,
@@ -717,7 +675,6 @@
         loading.classList.remove("show");
       }
     }
-
     function startSpeechRecognition() {
       if (busy) return;
 
@@ -734,7 +691,6 @@
         recognition.stop();
         return;
       }
-
       recognition = new SpeechRecognition();
       recognition.lang = speechLocales[language.value] || language.value;
       recognition.continuous = false;
@@ -748,7 +704,6 @@
       recognition.onresult = event => {
         const spokenText =
           event.results?.[0]?.[0]?.transcript?.trim() || "";
-
         if (!spokenText) {
           showStatus("I did not catch that.");
           return;
@@ -762,7 +717,6 @@
           language.value
         );
       };
-
       recognition.onerror = event => {
         if (
           event.error === "not-allowed" ||
@@ -776,7 +730,6 @@
           showStatus("No speech heard. Try again.");
           return;
         }
-
         if (event.error === "language-not-supported") {
           showStatus("Speech recognition does not support this language here.");
           return;
@@ -796,7 +749,6 @@
         showStatus("Could not start the microphone.");
       }
     }
-
     input.addEventListener("input", () => {
       count.textContent = input.value.length;
     });
@@ -813,7 +765,6 @@
         recognition.stop();
       }
     });
-
     document.addEventListener(
       "touchstart",
       event => {
@@ -832,7 +783,6 @@
         if (!touching || event.changedTouches.length !== 1) return;
 
         touching = false;
-
         const dx = event.changedTouches[0].clientX - startX;
         const dy = event.changedTouches[0].clientY - startY;
 
@@ -852,7 +802,6 @@
       },
       { passive: true }
     );
-
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
         navigator.serviceWorker
