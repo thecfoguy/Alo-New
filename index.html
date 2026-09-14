@@ -165,10 +165,16 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+      gap: 18px;
+      min-height: 0;
     }
 
-    .prompt {
-      margin: 0 0 14px;
+    .mode-section {
+      width: 100%;
+    }
+
+    .mode-title {
+      margin: 0 0 10px;
       color: var(--gray);
       font-size: 14px;
       font-weight: 800;
@@ -186,15 +192,15 @@
 
     textarea {
       width: 100%;
-      min-height: 150px;
-      max-height: 30vh;
+      min-height: 115px;
+      max-height: 22vh;
       resize: none;
       border: 0;
       outline: 0;
       padding: 0;
       background: transparent;
       color: var(--black);
-      font-size: clamp(28px, 7vw, 44px);
+      font-size: clamp(26px, 6.5vw, 40px);
       line-height: 1.15;
       font-weight: 700;
     }
@@ -203,18 +209,41 @@
       color: #b6b6b6;
     }
 
-    .input-bottom {
-      margin-top: 12px;
+    .input-meta {
+      margin-top: 10px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .counter {
+      color: #999;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--line);
+      margin: 0 2px;
+    }
+
+    .voice-card {
+      min-height: 140px;
+      padding: 18px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.08);
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+      gap: 18px;
     }
 
     .mic-button {
-      width: 58px;
-      height: 58px;
-      flex: 0 0 58px;
+      width: 68px;
+      height: 68px;
+      flex: 0 0 68px;
       border: 0;
       border-radius: 50%;
       background: var(--red);
@@ -230,8 +259,8 @@
     }
 
     .mic-button svg {
-      width: 27px;
-      height: 27px;
+      width: 30px;
+      height: 30px;
       fill: currentColor;
     }
 
@@ -252,24 +281,33 @@
       }
     }
 
-    .voice-copy {
+    .voice-area {
       flex: 1;
+      min-width: 0;
+    }
+
+    .voice-copy {
       color: #8a8a8a;
       font-size: 13px;
       line-height: 1.35;
       font-weight: 700;
     }
 
-    .counter {
-      margin-left: auto;
-      color: #999;
-      font-size: 12px;
+    .speech-transcript {
+      margin-top: 8px;
+      color: var(--black);
+      font-size: 18px;
+      line-height: 1.25;
       font-weight: 700;
-      white-space: nowrap;
+      word-break: break-word;
+    }
+
+    .speech-transcript.empty {
+      display: none;
     }
 
     .hint {
-      margin: 22px 0 0;
+      margin: 10px 0 0;
       text-align: center;
       color: #8b8b8b;
       font-size: 14px;
@@ -342,13 +380,28 @@
       opacity: 1;
     }
 
-    @media (max-height: 650px) {
+    @media (max-height: 700px) {
+      .content {
+        gap: 11px;
+      }
+
       textarea {
-        min-height: 110px;
+        min-height: 80px;
+      }
+
+      .voice-card {
+        min-height: 112px;
+        padding: 13px 16px;
+      }
+
+      .mic-button {
+        width: 58px;
+        height: 58px;
+        flex-basis: 58px;
       }
 
       .hint {
-        margin-top: 12px;
+        margin-top: 6px;
       }
     }
   </style>
@@ -381,42 +434,61 @@
         </header>
 
         <div class="content">
-          <p class="prompt">English</p>
+          <div class="mode-section">
+            <p class="mode-title">Type &amp; Translate</p>
 
-          <div class="input-card">
-            <textarea
-              id="englishInput"
-              maxlength="180"
-              autocomplete="off"
-              autocapitalize="sentences"
-              spellcheck="true"
-              placeholder="Type what you want to say or..."
-            ></textarea>
+            <div class="input-card">
+              <textarea
+                id="englishInput"
+                maxlength="180"
+                autocomplete="off"
+                autocapitalize="sentences"
+                spellcheck="true"
+                placeholder="Type what you want to say..."
+              ></textarea>
 
-            <div class="input-bottom">
+              <div class="input-meta">
+                <div class="counter">
+                  <span id="count">0</span>/180
+                </div>
+              </div>
+            </div>
+
+            <p class="hint">Swipe left to translate</p>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="mode-section">
+            <p class="mode-title">Listen &amp; Translate</p>
+
+            <div class="voice-card">
               <button
                 class="mic-button"
                 id="micButton"
                 type="button"
-                aria-label="Listen and translate"
-                title="Listen and translate"
+                aria-label="Listen"
+                title="Listen"
               >
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21H8v2h8v-2h-3v-3.08A7 7 0 0 0 19 11h-2Z"/>
                 </svg>
               </button>
 
-              <div class="voice-copy" id="voiceCopy">
-                Tap the mic to hear what they're saying and to translate it into English.
-              </div>
+              <div class="voice-area">
+                <div class="voice-copy" id="voiceCopy">
+                  Tap the mic and let them speak.
+                </div>
 
-              <div class="counter">
-                <span id="count">0</span>/180
+                <div
+                  class="speech-transcript empty"
+                  id="speechTranscript"
+                ></div>
               </div>
             </div>
-          </div>
 
-          <p class="hint">Swipe left to translate</p>
+            <p class="hint">Swipe left to translate</p>
+          </div>
         </div>
       </section>
 
@@ -483,47 +555,54 @@
         </header>
 
         <div class="content">
-          <p class="prompt">
-            English
-          </p>
+          <div class="mode-section">
+            <p class="mode-title">Type &amp; Translate</p>
 
-          <div class="input-card">
-            <textarea
-              tabindex="-1"
-              aria-hidden="true"
-              maxlength="180"
-              placeholder="Type what you want to say or..."
-              readonly
-            ></textarea>
+            <div class="input-card">
+              <textarea
+                tabindex="-1"
+                aria-hidden="true"
+                maxlength="180"
+                placeholder="Type what you want to say..."
+                readonly
+              ></textarea>
 
-            <div class="input-bottom">
+              <div class="input-meta">
+                <div class="counter">
+                  0/180
+                </div>
+              </div>
+            </div>
+
+            <p class="hint">Swipe left to translate</p>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="mode-section">
+            <p class="mode-title">Listen &amp; Translate</p>
+
+            <div class="voice-card">
               <button
                 class="mic-button"
                 type="button"
                 tabindex="-1"
                 aria-hidden="true"
               >
-                <svg
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21H8v2h8v-2h-3v-3.08A7 7 0 0 0 19 11h-2Z"/>
                 </svg>
               </button>
 
-              <div class="voice-copy">
-                Tap the mic to hear what they're saying and to translate it into English.
-              </div>
-
-              <div class="counter">
-                0/180
+              <div class="voice-area">
+                <div class="voice-copy">
+                  Tap the mic and let them speak.
+                </div>
               </div>
             </div>
-          </div>
 
-          <p class="hint">
-            Swipe left to translate
-          </p>
+            <p class="hint">Swipe left to translate</p>
+          </div>
         </div>
       </section>
     </div>
@@ -578,6 +657,9 @@
     const voiceCopy =
       document.getElementById("voiceCopy");
 
+    const speechTranscript =
+      document.getElementById("speechTranscript");
+
     const languageNames = {
       es: "Spanish",
       fr: "French",
@@ -605,6 +687,8 @@
     let listening = false;
     let recognition = null;
     let movingToFreshEntry = false;
+    let spokenText = "";
+    let activeMode = "type";
 
     function showStatus(message) {
       status.textContent = message;
@@ -630,9 +714,12 @@
       if (isListening) {
         voiceCopy.textContent =
           "Listening... speak now.";
+      } else if (spokenText) {
+        voiceCopy.textContent =
+          "Heard this. Swipe left to translate.";
       } else {
         voiceCopy.textContent =
-          "Tap the mic to hear what they're saying and to translate it into English.";
+          "Tap the mic and let them speak.";
       }
     }
 
@@ -640,6 +727,16 @@
       input.value = "";
 
       count.textContent = "0";
+
+      spokenText = "";
+
+      activeMode = "type";
+
+      speechTranscript.textContent = "";
+
+      speechTranscript.classList.add(
+        "empty"
+      );
 
       translatedText.textContent = "";
 
@@ -723,10 +820,6 @@
         track.classList.remove(
           "no-transition"
         );
-
-        setTimeout(() => {
-          input.focus();
-        }, 50);
       }
     );
 
@@ -999,12 +1092,8 @@
       return translated;
     }
 
-    async function swipeTranslate() {
-      if (
-        busy ||
-        listening ||
-        movingToFreshEntry
-      ) {
+    async function translateTypedEnglish() {
+      if (busy) {
         return;
       }
 
@@ -1070,14 +1159,17 @@
       }
     }
 
-    async function translateSpeechToEnglish(
-      spokenText,
-      sourceLanguage
-    ) {
+    async function translateSpokenLanguage() {
       if (
-        !spokenText ||
-        busy
+        busy ||
+        !spokenText
       ) {
+        if (!spokenText) {
+          showStatus(
+            "Tap the mic first"
+          );
+        }
+
         return;
       }
 
@@ -1094,7 +1186,7 @@
         const english =
           await requestTranslation(
             spokenText,
-            sourceLanguage,
+            language.value,
             "en"
           );
 
@@ -1119,6 +1211,41 @@
           "show"
         );
       }
+    }
+
+    async function swipeTranslate() {
+      if (
+        busy ||
+        listening ||
+        movingToFreshEntry
+      ) {
+        return;
+      }
+
+      if (
+        activeMode === "speech" &&
+        spokenText
+      ) {
+        await translateSpokenLanguage();
+
+        return;
+      }
+
+      if (input.value.trim()) {
+        await translateTypedEnglish();
+
+        return;
+      }
+
+      if (spokenText) {
+        await translateSpokenLanguage();
+
+        return;
+      }
+
+      showStatus(
+        "Type something or tap the mic first"
+      );
     }
 
     function startSpeechRecognition() {
@@ -1147,6 +1274,16 @@
         return;
       }
 
+      activeMode = "speech";
+
+      spokenText = "";
+
+      speechTranscript.textContent = "";
+
+      speechTranscript.classList.add(
+        "empty"
+      );
+
       recognition =
         new SpeechRecognition();
 
@@ -1174,7 +1311,7 @@
 
       recognition.onresult =
         event => {
-          const spokenText =
+          spokenText =
             event.results?.[0]?.[0]
               ?.transcript?.trim() ||
             "";
@@ -1187,19 +1324,21 @@
             return;
           }
 
-          input.value =
+          spokenText =
             spokenText.slice(
               0,
               180
             );
 
-          count.textContent =
-            input.value.length;
+          speechTranscript.textContent =
+            spokenText;
 
-          translateSpeechToEnglish(
-            spokenText,
-            language.value
+          speechTranscript.classList.remove(
+            "empty"
           );
+
+          voiceCopy.textContent =
+            "Heard this. Swipe left to translate.";
         };
 
       recognition.onerror =
@@ -1265,8 +1404,17 @@
     }
 
     input.addEventListener(
+      "focus",
+      () => {
+        activeMode = "type";
+      }
+    );
+
+    input.addEventListener(
       "input",
       () => {
+        activeMode = "type";
+
         count.textContent =
           input.value.length;
       }
@@ -1291,12 +1439,22 @@
         nextLanguage.value =
           language.value;
 
+        spokenText = "";
+
+        speechTranscript.textContent = "";
+
+        speechTranscript.classList.add(
+          "empty"
+        );
+
         if (
           listening &&
           recognition
         ) {
           recognition.stop();
         }
+
+        setListeningState(false);
       }
     );
 
